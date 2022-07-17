@@ -1,20 +1,18 @@
-from pickletools import read_uint1
-from rest_framework import generics, viewsets
+from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 
 from django.contrib.auth import authenticate
 
-
 from .models import Poll, Choice
 from .serializers import PollSerializer, ChoiceSerializer, VoteSerializer, UserSerializer
 
+
 # view for the login API
 class LoginView(APIView):
-    permission_classes = ()
-
     def post(self, request,):
         username = request.data.get("username")
         password = request.data.get("password")
@@ -28,8 +26,6 @@ class LoginView(APIView):
 
 # views to the User Serializer for creating the user 
 class UserCreate(generics.CreateAPIView):
-    authentication_classes = ()
-    permission_classes = ()
     serializer_class = UserSerializer
 
 class PollViewSet(viewsets.ModelViewSet):
@@ -42,13 +38,6 @@ class PollViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You cannot delete this poll.")
         return super().destroy(request, *args, **kwargs)
 
-class PollList(generics.ListCreateAPIView):
-    queryset = Poll.objects.all()
-    serializer_class = PollSerializer
-
-class PollDetail(generics.RetrieveDestroyAPIView):
-    queryset = Poll.objects.all()
-    serializer_class = PollSerializer
 
 class ChoiceList(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -64,8 +53,6 @@ class ChoiceList(generics.ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 class CreateVote(generics.CreateAPIView):
-    serlializer_class = VoteSerializer
-
     def post(self, request, pk, choice_pk):
         voted_by = request.data.get("voted_by")
         data = { 
